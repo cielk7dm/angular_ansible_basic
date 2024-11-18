@@ -22,6 +22,7 @@ jobs:
 
       - name: Build
         run: docker build -t ghcr.io/${{ github.repository }}/demo-app:latest .
+        build-args: PROFILE='dev'
       
       - name: Push
         run: docker push ghcr.io/${{ github.repository }}/demo-app:latest
