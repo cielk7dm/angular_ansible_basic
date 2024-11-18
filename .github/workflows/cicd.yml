@@ -3,7 +3,7 @@ name: Build and Push demo-app
 on:
   push:
     branches:
-      - main
+      - develop
       
 jobs:
   cicd:
@@ -12,9 +12,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-        defaults:
-          run:
-            working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Log Github Registry
         uses: docker/login-action@v2
