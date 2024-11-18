@@ -1,18 +1,15 @@
-#APP
 FROM node:18 AS builder
 
 WORKDIR /app
 
-COPY /app/demo-app /app
+COPY /demo-app /app
 
-ARG PROFILE
-ENV PROFILE=${PROFILE}
+RUN npm install -g @angular/cli \
+    && npm install
+RUN npm run build
 
-RUN echo "Environment: ${PROFILE}"
-RUN npm run build -- --profile=${PROFILE}
-
-RUN chmod +x /entrypoint/entrypoint.sh
+RUN chmod +x /app/entrypoint/entrypoint.sh
 
 EXPOSE 4200
 
-ENTRYPOINT ["/entrypoint/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint/entrypoint.sh"]

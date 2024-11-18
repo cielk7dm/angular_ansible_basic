@@ -1,12 +1,8 @@
-version: '3.3' 
-
 services:
   demo-app:
     image: demo-app
     build:
-      context: ./
+      context: .
       dockerfile: Dockerfile
-      args:
-        PROFILE: prod
     ports:
       - "80:4200"
