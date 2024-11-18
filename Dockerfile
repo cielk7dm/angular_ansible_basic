@@ -6,7 +6,7 @@ WORKDIR /app
 COPY /app/demo-app /app
 
 ARG PROFILE
-ENV PROFILE $PROFILE
+ENV PROFILE=${PROFILE}
 
 RUN echo "Environment: ${PROFILE}"
 RUN npm run build --profile=${PROFILE}
