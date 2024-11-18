@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: Build
-        run: docker build -t ghcr.io/${{ github.repository }}/demo-app:latest . --build-arg dev
+        run: docker build -t ghcr.io/${{ github.repository }}/demo-app:latest . --build-arg PROFILE=development 
       
       - name: Push
         run: docker push ghcr.io/${{ github.repository }}/demo-app:latest
