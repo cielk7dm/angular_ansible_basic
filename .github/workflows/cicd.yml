@@ -2,28 +2,57 @@ name: Build and Push demo-app
 
 on:
   push:
+    paths:
+      - 'infra/terragrunt/**'
     branches:
       - develop
       
 jobs:
-  cicd:
+  infra:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    permissions: write-all
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+    env:
+      WORKING_DIRECTORY: dev
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Log Github Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} 
-
-      - name: Build
-        run: docker build -t ghcr.io/${{ github.repository }}/demo-app:latest .
+      - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ github.ROLE_ARN }}
+        role-session-name: ghactions-demo-app
+        aws-region: ${{ github.AWS_REGION }}
       
-      - name: Push
-        run: docker push ghcr.io/${{ github.repository }}/demo-app:latest
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+      - name: Version Terraform  
+        run:
+          terraform --version
+
+      - name: Setup Terragrunt
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.68.7/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt -v
+
+      - name: Terragrunt Init
+        id: init
+        run: terragrunt run-all init
+
+      - name: Terragrunt Validate
+        id: validate
+        run: terragrunt run-all validate
+
+      - name: Trigger App Workflow
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          event-type: infra-trigger
+      

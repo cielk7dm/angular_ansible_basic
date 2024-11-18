@@ -1,0 +1,43 @@
+name: Build and Push demo-app
+
+on:
+  push:
+    paths:
+      - 'app/**'
+    branches:
+      - develop
+    repository_dispatch:
+    types: [infra-trigger]
+      
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log Github Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} 
+
+      - name: Build
+        run: docker build -t ghcr.io/${{ github.repository }}/demo-app:latest .
+      
+      - name: Push
+        run: docker push ghcr.io/${{ github.repository }}/demo-app:latest
+       
+    deploy-app:
+      name: Deployment
+      needs: app
+      runs-on: ubuntu-latest
+      steps:
+        - name: Deploy using Ansible
+          run: |
+            ansible-playbook -i inventory playbooks/deploy.yml

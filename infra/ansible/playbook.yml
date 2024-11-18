@@ -1,0 +1,37 @@
+---
+- name: Deploy Angular App
+  hosts: all
+  become: true
+  vars:
+    github_registry_url: "ghcr.io/tu-usuario/tu-repo:latest"
+    container_name: "angular-app"
+    app_port: 80
+  tasks:
+    - name: Ensure Docker is installed
+      ansible.builtin.package:
+        name: docker
+        state: present
+
+    - name: Log in to GitHub Container Registry
+      community.docker.docker_login:
+        registry_url: "ghcr.io"
+        username: "cielk7dm"
+        password: "{{ github_token }}"
+
+    - name: Pull the Docker image
+      community.docker.docker_image:
+        name: "{{ github_registry_url }}"
+        pull: yes
+
+    - name: Stop and remove existing container (if any)
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+
+    - name: Run the container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ github_registry_url }}"
+        ports:
+          - "{{ app_port }}:80"
+        state: started
