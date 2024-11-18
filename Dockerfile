@@ -9,7 +9,7 @@ ARG PROFILE
 ENV PROFILE $PROFILE
 
 RUN echo "Environment: ${PROFILE}"
-RUN npm build-- --profile=${PROFILE}
+RUN npm run build -- --profile=${PROFILE}
 
 RUN chmod +x /entrypoint/entrypoint.sh
 
