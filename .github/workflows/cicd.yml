@@ -11,7 +11,9 @@ jobs:
   infra:
     name: Terragrunt
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions: 
+    contents: read
+    id-token: write
 
     steps:
       - name: Checkout Code
