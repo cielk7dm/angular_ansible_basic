@@ -65,7 +65,7 @@ jobs:
       
       - name: Terragrunt Apply
         id: apply
-        run: terragrunt run-all apply --auto-approve
+        run: terragrunt run-all apply --auto-approve --terragrunt-non-interactive
 
       - name: Terragrunt Apply Status
         if: steps.apply.outcome == 'failure'
