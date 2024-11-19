@@ -1,5 +1,4 @@
-name: Build and Push demo-app
-
+name: Build and Push
 on:
   push:
     paths:
