@@ -12,6 +12,8 @@ on:
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
+  types:
+      - closed
 
 jobs:
   infra:
