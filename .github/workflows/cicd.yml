@@ -12,7 +12,7 @@ on:
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
-  types:
+    types:
       - closed
 
 jobs:
