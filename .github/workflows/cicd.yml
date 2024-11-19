@@ -44,7 +44,7 @@ jobs:
 
       - name: Terragrunt Init
         id: init
-        run: terragrunt run-all init
+        run: terragrunt run-all init -y
 
       - name: Terragrunt Validate
         id: validate
