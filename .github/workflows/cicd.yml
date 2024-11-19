@@ -9,6 +9,7 @@ on:
       
 jobs:
   infra:
+    name: Terragrunt
     runs-on: ubuntu-latest
     permissions: write-all
     defaults:
