@@ -8,7 +8,19 @@ on:
 
     branches:
       - develop
-      
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'infra/terragrunt/**'
+      - '.github/**'
+    types:
+      - closed
+      - open
+      - reopen
+
 jobs:
   infra:
     name: Terragrunt
@@ -60,7 +72,7 @@ jobs:
           echo "Running terragrunt plan"
           terragrunt run-all plan -no-color
         continue-on-error: true
-        
+
       
       - name: Terragrunt Apply
         id: apply
