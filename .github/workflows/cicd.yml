@@ -20,9 +20,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ github.ROLE_ARN }}
+          role-to-assume: ${{ secrets.ROLE_ARN }}
           role-session-name: ghactions-demo-app
-          aws-region: ${{ github.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
