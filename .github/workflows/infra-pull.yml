@@ -1,4 +1,4 @@
-name: Infra deployment
+name: Infra Deployment
 
 on:
   pull_request:
@@ -7,12 +7,11 @@ on:
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
-    types:
-      - closed
+    types: [opened, reopened]
 
 jobs:
   infra:
-    name: Terragrunt
+    name: Terragrunt Pull
     runs-on: ubuntu-latest
     permissions: 
       contents: read
