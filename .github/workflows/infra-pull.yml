@@ -74,6 +74,3 @@ jobs:
       - name: Terragrunt Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1 
-
-      - name: Debug Event
-        run: echo "${{ toJson(github) }}"
