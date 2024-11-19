@@ -1,0 +1,76 @@
+name: Infra Deployment
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'infra/terragrunt/**'
+      - '.github/**'
+    types: [opened, reopened]
+
+jobs:
+  infra:
+    name: Terragrunt Pull
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+  
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ROLE_ARN }}
+          role-session-name: ghactions_demo_app
+          aws-region: ${{ secrets.AWS_REGION }}
+           
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+      - name: Version Terraform  
+        run: terraform --version
+
+      - name: Setup Terragrunt
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.68.7/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt -v
+
+      - name: Set working directory
+        run: cd infra/terragrunt/vpc
+
+      - name: Terragrunt Init
+        id: init
+        run: terragrunt run-all init
+
+      - name: Terragrunt Validate
+        id: validate
+        run: terragrunt run-all validate
+
+      - name: Terragrunt Plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Running terragrunt plan"
+          terragrunt run-all plan -no-color
+        continue-on-error: true
+
+      
+      - name: Terragrunt Apply
+        id: apply
+        if: github.event.pull_request.merged == true
+        run: terragrunt run-all apply --auto-approve
+
+      - name: Terragrunt Apply Status
+        if: steps.apply.outcome == 'failure'
+        run: exit 1 
+
+      - name: Terragrunt Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1 

@@ -1,21 +1,14 @@
-name: Infra deployment
+name: Infra Push Validate
 
 on:
   push:
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
-      
-  pull_request:
-    branches:
-      - develop
-    paths:
-      - 'infra/terragrunt/**'
-      - '.github/**'
 
 jobs:
   infra:
-    name: Terragrunt
+    name: Terragrunt Push Validate
     runs-on: ubuntu-latest
     permissions: 
       contents: read
@@ -56,25 +49,3 @@ jobs:
       - name: Terragrunt Validate
         id: validate
         run: terragrunt run-all validate
-
-      - name: Terragrunt Plan
-        id: plan
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "Running terragrunt plan"
-          terragrunt run-all plan -no-color
-        continue-on-error: true
-
-      
-      - name: Terragrunt Apply
-        id: apply
-        if: github.event.pull_request.merged == true
-        run: terragrunt run-all apply --auto-approve
-
-      - name: Terragrunt Apply Status
-        if: steps.apply.outcome == 'failure'
-        run: exit 1 
-
-      - name: Terragrunt Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1 
