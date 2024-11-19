@@ -7,7 +7,7 @@ on:
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
-    types: [opened, reopened]
+    types: [closed]
 
 jobs:
   infra:
@@ -64,7 +64,7 @@ jobs:
       
       - name: Terragrunt Apply
         id: apply
-        if: github.event.pull_request.merged == true
+        if: ${{ github.event.pull_request.merged }}
         run: terragrunt run-all apply --auto-approve
 
       - name: Terragrunt Apply Status
