@@ -53,10 +53,20 @@ jobs:
         id: validate
         run: terragrunt run-all validate
 
-      - name: Trigger App Workflow
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          event-type: infra-trigger
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Terragrunt Plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Running terragrunt plan"
+          terragrunt run-all plan -no-color
+        continue-on-error: true
+        
       
+      - name: Terragrunt Apply
+        id: apply
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+        run: terragrunt run-all apply --terragrunt-non-interactive
 
+      - name: Terragrunt Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1 
