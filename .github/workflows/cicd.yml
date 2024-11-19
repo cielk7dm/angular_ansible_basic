@@ -42,6 +42,9 @@ jobs:
           sudo chmod +x /usr/bin/terragrunt
           terragrunt -v
 
+      - name: Set working directory
+        run: cd infra/terragrunt/vpc
+
       - name: Terragrunt Init
         id: init
         run: terragrunt run-all init -y
