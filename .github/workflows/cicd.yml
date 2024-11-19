@@ -12,11 +12,6 @@ jobs:
     name: Terragrunt
     runs-on: ubuntu-latest
     permissions: write-all
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-    env:
-      WORKING_DIRECTORY: dev
 
     steps:
       - name: Checkout Code
