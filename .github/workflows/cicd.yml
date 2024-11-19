@@ -29,8 +29,12 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: ${{ secrets.ROLE_ARN }}
-          role-session-name: ghactions-demo-app
+          role-session-name: ghactions_demo_app
           aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
