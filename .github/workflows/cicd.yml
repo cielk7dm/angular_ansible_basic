@@ -1,11 +1,6 @@
 name: Infra deployment
 
 on:
-  push:
-    paths:
-      - 'infra/terragrunt/**'
-      - '.github/**'
-      
   pull_request:
     branches:
       - develop
