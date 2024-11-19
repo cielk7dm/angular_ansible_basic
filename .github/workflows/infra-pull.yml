@@ -1,16 +1,18 @@
 name: Infra Deployment
 
 on:
-  pull_request:
+  pull_request_target:
+    types:
+      - closed
     branches:
       - develop
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
-    types: [closed]
 
 jobs:
   infra:
+    if: github.event.pull_request.merged == true
     name: Terragrunt Pull
     runs-on: ubuntu-latest
     permissions: 
@@ -55,7 +57,6 @@ jobs:
 
       - name: Terragrunt Plan
         id: plan
-        if: github.event_name == 'pull_request'
         run: |
           echo "Running terragrunt plan"
           terragrunt run-all plan -no-color
@@ -64,7 +65,6 @@ jobs:
       
       - name: Terragrunt Apply
         id: apply
-        if: ${{ github.event.pull_request.merged }}
         run: terragrunt run-all apply --auto-approve
 
       - name: Terragrunt Apply Status
