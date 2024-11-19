@@ -49,6 +49,4 @@ jobs:
       - name: Terragrunt Validate
         id: validate
         run: terragrunt run-all validate
-      
-      - name: Debug Event
-        run: echo "${{ toJson(github) }}"
+
