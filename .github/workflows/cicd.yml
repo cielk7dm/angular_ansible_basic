@@ -5,10 +5,7 @@ on:
     paths:
       - 'infra/terragrunt/**'
       - '.github/**'
-
-    branches:
-      - develop
-      - main
+      
   pull_request:
     branches:
       - main
