@@ -79,5 +79,5 @@ jobs:
       - name: Run Ansible Playbook
         working-directory: infra/ansible
         run: |
-          ansible-playbook -i "$IP," -u ec2-user --private-key $HOME/.ssh/id_rsa playbook.yml
+          ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=accept-new' -i "$IP," -u ec2-user --private-key $HOME/.ssh/id_rsa playbook.yml
 
