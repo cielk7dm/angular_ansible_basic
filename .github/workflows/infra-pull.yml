@@ -76,7 +76,7 @@ jobs:
 
       - name: Save EC2 Data0
         working-directory: infra/terragrunt/live/non-prod/staging/key-pairs/ec2-user
-        id: save-data
+        id: save-data0
         run: |
           PRIVATE_KEY=$(terragrunt output -raw private_key)
           echo $PRIVATE_KEY >> ~/.ssh/id_rsa
