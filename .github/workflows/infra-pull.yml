@@ -68,11 +68,19 @@ jobs:
         run: terragrunt run-all apply --auto-approve --terragrunt-non-interactive
 
       - name: Save EC2 Data
+        working-directory: infra/terragrunt/live/non-prod/staging/ec2/demo-app
         id: save-data
         run: |
-          pwd
-          ls -l
-          
+          IP=$(terragrunt output -raw public_ip)
+          echo "IP=$IP" >> $GITHUB_ENV
+
+      - name: Save EC2 Data0
+        working-directory: infra/terragrunt/live/non-prod/staging/key-pairs/ec2-user
+        id: save-data
+        run: |
+          PRIVATE_KEY=$(terragrunt output -raw private_key)
+          echo $PRIVATE_KEY >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
       - name: Terragrunt Apply Status
         if: steps.apply.outcome == 'failure'
         run: exit 1 
@@ -87,9 +95,7 @@ jobs:
           sudo apt install -y ansible
 
       - name: Run Ansible Playbook
+        working-directory: infra/ansible
         run: |
-          PRIVATE_KEY=$(terragrunt output -raw private_key)
-          echo $PRIVATE_KEY >> ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ansible-playbook -i "$(terraform output -raw public_ip)," -u ubuntu --private-key ~/.ssh/id_rsa infra/ansible/playbook.yml
+          ansible-playbook -i "$(env.IP)," -u ubuntu --private-key ~/.ssh/id_rsa playbook.yml
 
