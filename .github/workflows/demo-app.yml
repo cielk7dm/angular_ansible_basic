@@ -89,5 +89,5 @@ jobs:
         env:
           image_version: ${{ env.COMMIT_HASH }} 
         run: |
-          ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=accept-new' -i "$IP," -u ec2-user --private-key $HOME/.ssh/id_rsa deploy.yml
+          ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=accept-new' -i "$IP," -u ec2-user --private-key $HOME/.ssh/id_rsa deploy.yml --extra-vars "image_version=${{ env.COMMIT_HASH }}
 
