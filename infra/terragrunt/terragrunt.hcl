@@ -1,5 +1,5 @@
 locals {
-  account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
+  account_vars = read_terragrunt_config("${get_path_to_repo_root()}/infra/terragrunt/live/non-prod/account.hcl")
 
   account_name = local.account_vars.locals.account_name
   account_id   = local.account_vars.locals.aws_account_id
@@ -42,6 +42,4 @@ EOF
 
 inputs = merge(
   local.account_vars.locals,
-  local.region_vars.locals,
-  local.environment_vars.locals,
 )
