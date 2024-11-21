@@ -32,11 +32,11 @@ jobs:
       - name: Push
         run: docker push ghcr.io/${{ github.repository }}/demo-app:latest
        
-    deploy-app:
-      name: Deployment
+    run-ansible:
+      name: App deployment
       needs: app
       runs-on: ubuntu-latest
       steps:
         - name: Deploy using Ansible
           run: |
-            ansible-playbook -i inventory playbooks/deploy.yml
+            ansible-playbook -i infra/ansible/playbook.yml

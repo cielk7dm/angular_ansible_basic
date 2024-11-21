@@ -67,6 +67,12 @@ jobs:
         id: apply
         run: terragrunt run-all apply --auto-approve --terragrunt-non-interactive
 
+      - name: Save EC2 Data
+        id: save-data
+        run: |
+          IP=$(terragrunt output -raw public_ip)
+          echo "EC2_PUBLIC_IP=$IP" >> $GITHUB_ENV
+
       - name: Terragrunt Apply Status
         if: steps.apply.outcome == 'failure'
         run: exit 1 
@@ -74,3 +80,16 @@ jobs:
       - name: Terragrunt Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1 
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Run Ansible Playbook
+        run: |
+          PRIVATE_KEY=$(terragrunt output -raw private_key)
+          echo $PRIVATE_KEY >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ansible-playbook -i "$(terraform output -raw public_ip)," -u ubuntu --private-key ~/.ssh/id_rsa infra/ansible/playbook.yml
+

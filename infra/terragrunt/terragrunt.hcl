@@ -1,7 +1,12 @@
 locals {
-  aws_region        = "us-east-1"
-  deployment_prefix = "demo-app"
-  account_id        = "419638816579"
+  account_vars = read_terragrunt_config(find_in_parent_folders("account.hcl"))
+  region_vars = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+
+  account_name = local.account_vars.locals.account_name
+  account_id   = local.account_vars.locals.aws_account_id
+  aws_region   = local.region_vars.locals.aws_region
+  environment  = local.environment_vars.locals.environment
 }
 
 remote_state {
@@ -11,7 +16,7 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    bucket         = "${local.deployment_prefix}-terragrunt-states-1234567892014sj2"
+    bucket         = "${local.environment}-${local.aws_region}-${local.account_name}-tfstates"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = local.aws_region
     encrypt        = true
@@ -24,33 +29,21 @@ generate "provider" {
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
 provider "aws" {
-  region = var.aws_region
-  allowed_account_ids = [var.account_id]
+  region = "${local.aws_region}"
+  allowed_account_ids =  ["${local.account_id}"]
   default_tags {
-    tags = var.default_tags
+    tags = {
+      AccountName = "${local.account_name}"
+      DeployedBy  = "Terragrunt"
+      Environment = "${local.environment}"
+    }
   }
-}
-
-variable "aws_region" {
-  type = string
-}
-
-variable "account_id"{
-  type = string
-}
-
-variable "default_tags" {
-  type        = map(string)
 }
 EOF
 }
 
-inputs = {
-  aws_region        = local.aws_region
-  deployment_prefix = local.deployment_prefix
-  account_id        = local.account_id
-  default_tags = {
-    "DeployedBy"       = "Terragrunt",
-    "DeploymentPrefix" = local.deployment_prefix
-  }
-}
+inputs = merge(
+  local.account_vars.locals,
+  local.region_vars.locals,
+  local.environment_vars.locals,
+)
