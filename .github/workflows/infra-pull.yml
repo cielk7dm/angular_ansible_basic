@@ -79,8 +79,8 @@ jobs:
         id: save-data0
         run: |
           PRIVATE_KEY=$(terragrunt output -raw private_key)
-          echo $PRIVATE_KEY >> ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo $PRIVATE_KEY >> $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
 
       - name: Terragrunt Apply Status
         if: steps.apply.outcome == 'failure'
@@ -98,5 +98,5 @@ jobs:
       - name: Run Ansible Playbook
         working-directory: infra/ansible
         run: |
-          ansible-playbook -i "$(env.IP)," -u ubuntu --private-key ~/.ssh/id_rsa playbook.yml
+          ansible-playbook -i "$(env.IP)," -u ubuntu --private-key $HOME/.ssh/id_rsa playbook.yml
 

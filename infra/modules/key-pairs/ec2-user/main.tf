@@ -4,10 +4,6 @@ resource "aws_key_pair" "main" {
 
   tags            = var.tags
 
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy = true
-  }
 }
 
 resource "tls_private_key" "main" {
@@ -18,4 +14,9 @@ resource "tls_private_key" "main" {
 resource "local_file" "private" {
   content = tls_private_key.main.private_key_pem
   filename = "${aws_key_pair.main.key_name}.pem"
+  
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy = true
+  }
 }
