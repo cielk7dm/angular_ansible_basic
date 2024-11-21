@@ -19,8 +19,6 @@ terraform {
 
 inputs = {
   name                 = "demo-app-vpc"
-  enable_dns_support   = false
-  enable_dns_hostnames = false
   vpc_cidr             = "10.0.0.0/16"
   azs                  = ["us-east-1a","us-east-1b","us-east-1c"]
 
