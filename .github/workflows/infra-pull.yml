@@ -65,7 +65,7 @@ jobs:
           PRIVATE_KEY=$(terragrunt output -raw private_key)
           mkdir -p $HOME/.ssh 
           echo $PRIVATE_KEY
-          echo $PRIVATE_KEY | sed 's/\\n/\n/g' > $HOME/.ssh/id_rsa
+          echo -e "${{ secrets.PRIVATE_KEY }}" | tr -d '\r' >  $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
           cat $HOME/.ssh/id_rsa
 
