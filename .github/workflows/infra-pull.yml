@@ -56,7 +56,7 @@ jobs:
         id: save-data
         run: |
           IP=$(terragrunt output -raw public_ip)
-          echo "IP=$IP" >> $GITHUB_ENV
+          echo "IP=$IP" > $GITHUB_ENV
 
       - name: Save EC2 Data0
         working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/key-pairs/ec2-user
@@ -64,7 +64,7 @@ jobs:
         run: |
           PRIVATE_KEY=$(terragrunt output -raw private_key)
           mkdir -p $HOME/.ssh 
-          echo $PRIVATE_KEY >> $HOME/.ssh/id_rsa
+          echo $PRIVATE_KEY | sed 's/\\n/\n/g' > $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
 
       - name: Terragrunt Apply Status
