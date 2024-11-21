@@ -62,7 +62,6 @@ jobs:
         working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/key-pairs/ec2-user
         id: save-data0
         run: |
-          cat ${{ secrets.PRIVATE_KEY }}
           echo -e "${{ secrets.PRIVATE_KEY }}" >  $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
           cat $HOME/.ssh/id_rsa
