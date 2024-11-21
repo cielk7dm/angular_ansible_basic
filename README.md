@@ -1,34 +1,62 @@
 # AWS EC2 + Angular + Docker + Ansible + Terragrunt + GitHub Actions
 
-The following mono repo demostrates an example of a GITOps CI/CD workflow by using GitHub Actions.
+This monorepo demonstrates an example of a GitOps CI/CD workflow using GitHub Actions.
 
-** This is not a production ready pipeline. **
+> **Note:** This is not a production-ready pipeline. It serves as a proof of concept.
 
+---
 
-Requierements:
-    - Github account.
-    - Terraform / OpenTofu.
-    - Terragrunt.
-    - Ansible.
-    - Docker, Docker Compose.
-    - An Angular demo.
-    - An AWS Account.
+## Requirements
 
-### Steps
-- Create an IAM Role for OIDC. 
-- Identity provider for OIDC.
-- Add secrets to GHRepo.
-    * AWS_REGION, ROLE_ARN, PRIVATE_KEY
-- Create Classic TOKEN with read,write permissions.
+Before proceeding, ensure you have the following:
 
-### GitHub Actions
-- Write changes to app or terragrunt code, this enables the workflows.
-    * Begin with VPC, SSH and EC2 the last.
+- A GitHub account.
+- Terraform or OpenTofu.
+- Terragrunt.
+- Ansible.
+- Docker and Docker Compose.
+- A sample Angular application.
+- An AWS account.
 
-### Command line.
+---
 
-- Run at child HCL file.
-    * terragrunt plan, apply or destroy.
-- Ansible playbooks
-    * The key pair is at tf states files. Clean the string and save it locally $HOME/.ssh/demo-app.
-    * ansible-playbook -i "<EC2PUBLICIP>," -u ec2-user --private-key $HOME/.ssh/demo-app <YMLFILEHERE>
+## Steps to Set Up
+
+1. **Create an IAM Role for OIDC:**
+   - Create an IAM Role in AWS for OpenID Connect (OIDC) authentication.
+
+2. **Set Up an OIDC Identity Provider:**
+   - Configure your GitHub repository to authenticate with AWS using OIDC.
+
+3. **Add Secrets to Your GitHub Repository:**
+   - Add the following secrets to your repository:
+     - `AWS_REGION`: The AWS region where your resources will be deployed.
+     - `ROLE_ARN`: The ARN of the IAM Role for OIDC.
+     - `PRIVATE_KEY`: Your EC2 private SSH key for Ansible.
+
+4. **Generate a GitHub Classic Token:**
+   - Create a GitHub token with `read` and `write` permissions.
+
+---
+
+## GitHub Actions Workflow
+
+- Make changes to the Angular application or Terragrunt code. This will trigger the GitHub Actions workflows.
+- The workflows will follow a step-by-step approach:
+  1. **Start with VPC creation.**
+  2. **Provision SSH keys.**
+  3. **Deploy the EC2 instance.**
+  4. **Change app code.**
+
+---
+
+## Command Line Usage
+
+### Terragrunt
+
+Navigate to the directory containing the relevant resource where `terragrunt.hcl` file resides and run:
+
+```bash
+terragrunt plan    # To preview changes
+terragrunt apply   # To apply changes
+terragrunt destroy # To tear down resources
