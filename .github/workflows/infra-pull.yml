@@ -99,5 +99,5 @@ jobs:
       - name: Run Ansible Playbook
         working-directory: infra/ansible
         run: |
-          ansible-playbook -i "$(env.IP)," -u ubuntu --private-key $HOME/.ssh/id_rsa playbook.yml
+          ansible-playbook -i $IP -u ec2-user --private-key $HOME/.ssh/id_rsa playbook.yml
 
