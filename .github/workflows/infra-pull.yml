@@ -81,6 +81,7 @@ jobs:
           PRIVATE_KEY=$(terragrunt output -raw private_key)
           echo $PRIVATE_KEY >> ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+
       - name: Terragrunt Apply Status
         if: steps.apply.outcome == 'failure'
         run: exit 1 
