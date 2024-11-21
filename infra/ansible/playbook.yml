@@ -1,16 +1,16 @@
 ---
 - hosts: all
+  strategy: free
   tasks:
-    - name: Update packages
-      apt:
-        update_cache: yes
+    - name: Update
+      command: sudo yum update -y
     
-    - name: Install Docker
-      apt:
-        name: docker.io
-        state: present
+    - name: Install
+      command: sudo yum install -y docker
 
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
+    - name: Start Docker
+      command: sudo service docker start
+    
+    - name: Add group
+      command: sudo usermod -a -G docker ec2-user 
+
