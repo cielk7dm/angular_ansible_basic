@@ -24,9 +24,32 @@ Before proceeding, ensure you have the following:
 
 1. **Create an IAM Role for OIDC:**
    - Create an IAM Role in AWS for OpenID Connect (OIDC) authentication.
+   - Trust relationship.
+   ``{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::1234567890:oidc-provider/token.actions.githubusercontent.com"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                },
+                "StringLike": {
+                    "token.actions.githubusercontent.com:sub": "repo:owner/reponame:*"
+                }
+            }
+        }
+    ]
+}``
+- Attach permissions as you require.
 
 2. **Set Up an OIDC Identity Provider:**
    - Configure your GitHub repository to authenticate with AWS using OIDC.
+   - ``token.actions.githubusercontent.com``
 
 3. **Add Secrets to Your GitHub Repository:**
    - Add the following secrets to your repository:
