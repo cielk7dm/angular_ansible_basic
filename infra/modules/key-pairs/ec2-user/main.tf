@@ -3,6 +3,11 @@ resource "aws_key_pair" "main" {
   public_key      = tls_private_key.main.public_key_openssh
 
   tags            = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy = true
+  }
 }
 
 resource "tls_private_key" "main" {

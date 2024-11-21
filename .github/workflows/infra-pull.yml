@@ -68,14 +68,14 @@ jobs:
         run: terragrunt run-all apply --auto-approve --terragrunt-non-interactive
 
       - name: Save EC2 Data
-        working-directory: infra/terragrunt/live/non-prod/staging/ec2/demo-app
+        working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/ec2/demo-app
         id: save-data
         run: |
           IP=$(terragrunt output -raw public_ip)
           echo "IP=$IP" >> $GITHUB_ENV
 
       - name: Save EC2 Data0
-        working-directory: infra/terragrunt/live/non-prod/staging/key-pairs/ec2-user
+        working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/key-pairs/ec2-user
         id: save-data0
         run: |
           PRIVATE_KEY=$(terragrunt output -raw private_key)
