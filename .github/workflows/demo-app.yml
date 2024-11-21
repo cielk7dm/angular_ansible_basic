@@ -42,7 +42,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.ROLE_ARN }}
-          role-session-name: ghactions_demo_app-apply
+          role-session-name: ghactions_demo_app-app
           aws-region: ${{ secrets.AWS_REGION }}
            
       - name: Setup Terraform
