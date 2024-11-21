@@ -79,6 +79,7 @@ jobs:
         id: save-data0
         run: |
           PRIVATE_KEY=$(terragrunt output -raw private_key)
+          mkdir -p $HOME/.ssh 
           echo $PRIVATE_KEY >> $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
 
