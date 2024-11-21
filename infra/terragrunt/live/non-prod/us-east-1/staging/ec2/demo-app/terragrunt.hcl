@@ -30,7 +30,7 @@ inputs = {
   key_name = dependency.key-pair.outputs.key_name
 
   vpc_id        = dependency.vpc.outputs.vpc_id
-  vpc_subnet_id = dependency.vpc.outputs.vpc_subnet_ids[0]
+  vpc_subnet_id = dependency.vpc.outputs.vpc_subnet_ids[1]
   cidr          = "0.0.0.0/0"
 
   private_key = dependency.key-pair.outputs.private_key
