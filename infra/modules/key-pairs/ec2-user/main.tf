@@ -10,13 +10,3 @@ resource "tls_private_key" "main" {
   algorithm = var.private_key_algorithm
   rsa_bits  = var.private_key_rsa_bits
 }
-
-resource "local_file" "private" {
-  content = tls_private_key.main.private_key_pem
-  filename = "${aws_key_pair.main.key_name}.pem"
-  
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy = true
-  }
-}
