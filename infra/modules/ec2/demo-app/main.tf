@@ -18,6 +18,13 @@ resource "aws_security_group" "main" {
   vpc_id = var.vpc_id
   ingress {
     description = "Allow traffic"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Allow traffic"
     from_port   = 4200
     to_port     = 4200
     protocol    = "tcp"
