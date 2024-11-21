@@ -1,16 +1,16 @@
 ---
 - hosts: all
   tasks:
-    - name: Pull Docker image
-      command: docker pull ghcr.io/cielk7dm/angular_ansible_basic/demo-app:latest
+    - name: Ensure the latest Docker image is pulled
+      community.docker.docker_image:
+        name: ghcr.io/cielk7dm/angular_ansible_basic/demo-app:latest
+        source: pull
 
-    - name: Stop existing container
-      command: docker stop demo-app || true
-    
-    - name: Remove existing container
-      command: docker rm demo-app || true
-    
-    - name: Run new container
-      command: >
-        docker run -d --name demo-app -p 80:4200
-        ghcr.io/cielk7dm/angular_ansible_basic/demo-app:latest
+    - name: Replace the running container with the updated one
+      community.docker.docker_container:
+        name: demo-app
+        image: ghcr.io/cielk7dm/angular_ansible_basic/demo-app:latest
+        published_ports:
+          - "80:4200"
+        state: started
+        recreate: true

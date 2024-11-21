@@ -1,15 +1,17 @@
 name: Build and Push
+
 on:
-  push:
-    paths:
-      - 'app/**'
+  pull_request_target:
+    types:
+      - closed
     branches:
       - develop
-    repository_dispatch:
-    types: [infra-trigger]
+    paths:
+      - 'demo-app/**'
       
 jobs:
   app:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,7 +19,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Log Github Registry
         uses: docker/login-action@v2
@@ -32,11 +34,54 @@ jobs:
       - name: Push
         run: docker push ghcr.io/${{ github.repository }}/demo-app:latest
        
-    run-ansible:
-      name: App deployment
-      needs: app
-      runs-on: ubuntu-latest
-      steps:
-        - name: Deploy using Ansible
-          run: |
-            ansible-playbook -i infra/ansible/playbook.yml
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ROLE_ARN }}
+          role-session-name: ghactions_demo_app-apply
+          aws-region: ${{ secrets.AWS_REGION }}
+           
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+      - name: Version Terraform  
+        run: terraform --version
+
+      - name: Setup Terragrunt
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.68.7/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt -v
+
+      - name: Set TG_CONFIG_PATH
+        run: export TG_CONFIG_PATH=infra/terragrunt/terragrunt.hcl
+      
+      - name: Save EC2 Data
+        working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/ec2/demo-app
+        id: save-data
+        run: |
+          IP=$(terragrunt output -raw public_ip)
+          echo "IP=$IP" > $GITHUB_ENV
+
+      - name: Save EC2 Data0
+        working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/key-pairs/ec2-user
+        id: save-data0
+        run: |
+          cd
+          mkdir .ssh
+          echo -e "${{ secrets.PRIVATE_KEY }}" >  $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
+          cat $HOME/.ssh/id_rsa
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Run Ansible Playbook
+        working-directory: infra/ansible
+        run: |
+          ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=accept-new' -i "$IP," -u ec2-user --private-key $HOME/.ssh/id_rsa deploy.yml
+
