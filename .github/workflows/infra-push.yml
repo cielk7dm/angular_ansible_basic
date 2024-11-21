@@ -40,7 +40,7 @@ jobs:
           terragrunt -v
 
       - name: Set working directory
-        run: cd infra/terragrunt/vpc
+        run: cd infra/terragrunt
 
       - name: Terragrunt Init
         id: init
