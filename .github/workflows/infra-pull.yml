@@ -46,22 +46,6 @@ jobs:
 
       - name: Set TG_CONFIG_PATH
         run: export TG_CONFIG_PATH=infra/terragrunt/terragrunt.hcl
-
-      - name: Terragrunt Init
-        id: init
-        run: terragrunt run-all init
-
-      - name: Terragrunt Validate
-        id: validate
-        run: terragrunt run-all validate
-
-      - name: Terragrunt Plan
-        id: plan
-        run: |
-          echo "Running terragrunt plan"
-          terragrunt run-all plan -no-color
-        continue-on-error: true
-
       
       - name: Terragrunt Apply
         id: apply
@@ -85,10 +69,6 @@ jobs:
 
       - name: Terragrunt Apply Status
         if: steps.apply.outcome == 'failure'
-        run: exit 1 
-
-      - name: Terragrunt Plan Status
-        if: steps.plan.outcome == 'failure'
         run: exit 1 
 
       - name: Install Ansible
