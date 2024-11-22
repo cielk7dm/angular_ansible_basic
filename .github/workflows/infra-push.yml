@@ -1,0 +1,61 @@
+name: Infra Push Validate
+
+on:
+  push:
+    paths:
+      - 'infra/terragrunt/**'
+
+jobs:
+  infra:
+    name: Terragrunt Push Validate
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+  
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ROLE_ARN }}
+          role-session-name: ghactions_demo_app-validate
+          aws-region: ${{ secrets.AWS_REGION }}
+           
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+      - name: Version Terraform  
+        run: terraform --version
+
+      - name: Setup Terragrunt
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.68.7/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt -v
+
+      - name: Set TG_CONFIG_PATH
+        run: export TG_CONFIG_PATH=infra/terragrunt/terragrunt.hcl
+
+      - name: Terragrunt Init
+        id: init
+        run: terragrunt run-all init
+
+      - name: Terragrunt Validate
+        id: validate
+        run: terragrunt run-all validate
+
+      - name: Terragrunt Plan
+        id: plan
+        run: |
+          echo "Running terragrunt plan"
+          terragrunt run-all plan -no-color
+        continue-on-error: true
+
+      - name: Terragrunt Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1 

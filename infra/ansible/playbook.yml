@@ -1,0 +1,16 @@
+---
+- hosts: all
+  strategy: free
+  tasks:
+    - name: Update
+      command: sudo yum update -y
+    
+    - name: Install
+      command: sudo yum install -y docker
+
+    - name: Start Docker
+      command: sudo service docker start
+    
+    - name: Add group
+      command: sudo usermod -a -G docker ec2-user 
+

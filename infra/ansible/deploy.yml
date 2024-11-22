@@ -1,0 +1,16 @@
+---
+- hosts: all
+  tasks:
+    - name: Ensure the latest Docker image is pulled
+      community.docker.docker_image:
+        name: ghcr.io/cielk7dm/angular_ansible_basic/demo-app:{{ image_version }}
+        source: pull
+
+    - name: Replace the running container with the updated one
+      community.docker.docker_container:
+        name: demo-app
+        image: ghcr.io/cielk7dm/angular_ansible_basic/demo-app:{{ image_version }}
+        published_ports:
+          - "80:4200"
+        state: started
+        recreate: true

@@ -1,0 +1,83 @@
+name: Infra Deployment
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - 'infra/terragrunt/**'
+
+jobs:
+  infra:
+    if: github.event.pull_request.merged == true
+    name: Terragrunt Pull
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+  
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ROLE_ARN }}
+          role-session-name: ghactions_demo_app-apply
+          aws-region: ${{ secrets.AWS_REGION }}
+           
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+          terraform_wrapper: false
+      - name: Version Terraform  
+        run: terraform --version
+
+      - name: Setup Terragrunt
+        run: |
+          sudo wget -q -O /usr/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/v0.68.7/terragrunt_linux_amd64"
+          sudo chmod +x /usr/bin/terragrunt
+          terragrunt -v
+
+      - name: Set TG_CONFIG_PATH
+        run: export TG_CONFIG_PATH=infra/terragrunt/terragrunt.hcl
+      
+      - name: Terragrunt Apply
+        id: apply
+        run: terragrunt run-all apply --auto-approve --terragrunt-non-interactive
+
+      - name: Save EC2 Data
+        working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/ec2/demo-app
+        id: save-data
+        run: |
+          IP=$(terragrunt output -raw public_ip)
+          echo "IP=$IP" > $GITHUB_ENV
+
+      - name: Save EC2 Data0
+        working-directory: infra/terragrunt/live/non-prod/us-east-1/staging/key-pairs/ec2-user
+        id: save-data0
+        run: |
+          cd
+          mkdir .ssh
+          echo -e "${{ secrets.PRIVATE_KEY }}" >  $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
+          cat $HOME/.ssh/id_rsa
+
+      - name: Terragrunt Apply Status
+        if: steps.apply.outcome == 'failure'
+        run: exit 1 
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Run Ansible Playbook
+        working-directory: infra/ansible
+        run: |
+          ansible-playbook --ssh-common-args='-o StrictHostKeyChecking=accept-new' -i "$IP," -u ec2-user --private-key $HOME/.ssh/id_rsa playbook.yml
+
